@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Musical Bazilio</title>
+  <style>
+    body { 
+      font-family: system-ui, -apple-system, sans-serif; 
+      margin: 0; 
+      padding: 2rem; 
+      background-color: #f7f9f8;
+      color: #2f3e46;
+    }
+    .app-layout {
+      display: grid;
+      grid-template-columns: 350px 1fr;
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      align-items: start;
+    }
+    .control-panel {
+      background: #ffffff;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    h1 { 
+      font-size: 1.5rem; 
+      margin-top: 0; 
+      color: #354f52; 
+    }
+    label { 
+      display: block; 
+      margin-bottom: 0.5rem; 
+      font-weight: 600; 
+      font-size: 0.9rem;
+    }
+    textarea#notas { 
+      width: 100%; 
+      height: 100px; 
+      font-size: 1rem; 
+      padding: 0.5rem; 
+      box-sizing: border-box; 
+      border: 1px solid #cad2c5;
+      border-radius: 4px;
+      font-family: monospace;
+      resize: vertical;
+    }
+    .btn-group {
+      margin-top: 1rem;
+      display: flex;
+      gap: 0.5rem;
+    }
+    button { 
+      font-size: 0.95rem; 
+      padding: 0.6rem 1rem; 
+      cursor: pointer; 
+      border: none;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+    button#crear {
+      background-color: #52796f;
+      color: white;
+      flex: 1;
+    }
+    button#crear:hover {
+      background-color: #354f52;
+    }
+    button#borrar {
+      background-color: #e0f2f1;
+      color: #2f3e46;
+    }
+    button#borrar:hover {
+      background-color: #b2dfdb;
+    }
+    pre#estado { 
+      background: #eaf4f4; 
+      color: #2f3e46; 
+      padding: 0.75rem; 
+      font-size: 0.85rem;
+      overflow-x: auto; 
+      border-radius: 4px;
+      margin-top: 1rem;
+      white-space: pre-wrap;
+    }
+    pre#estado:empty {
+      display: none;
+    }
+    #resultado { 
+      display: none; 
+      background: #ffffff;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .results-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+    .full-width {
+      grid-column: span 2;
+    }
+    h2 { 
+      font-size: 1rem; 
+      margin-top: 0; 
+      margin-bottom: 0.5rem; 
+      color: #52796f;
+      border-bottom: 1px solid #eef2f2;
+      padding-bottom: 0.25rem;
+    }
+    pre#bzl, pre#ly { 
+      background: #f8f9fa; 
+      color: #333; 
+      padding: 0.75rem; 
+      overflow-x: auto; 
+      font-size: 0.85rem;
+      border-radius: 4px;
+      max-height: 150px;
+    }
+    iframe#pdf { 
+      width: 100%; 
+      height: 300px; 
+      border: 1px solid #cad2c5; 
+      border-radius: 4px;
+    }
+    audio { 
+      width: 100%; 
+      height: 32px;
+    }
+    .audio-box {
+      margin-bottom: 0.75rem;
+    }
+    .audio-label {
+      font-size: 0.8rem;
+      color: #6c757d;
+      margin-bottom: 0.2rem;
+    }
+    ul#descargas { 
+      list-style: none; 
+      padding: 0; 
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 0;
+    }
+    ul#descargas li a {
+      display: inline-block;
+      padding: 0.4rem 0.8rem;
+      background: #eaf4f4;
+      color: #2f3e46;
+      text-decoration: none;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-family: monospace;
+    }
+    ul#descargas li a:hover {
+      background: #cad2c5;
+    }
+    @media (max-width: 900px) {
+      .app-layout {
+        grid-template-columns: 1fr;
+      }
+      .results-grid {
+        grid-template-columns: 1fr;
+      }
+      .full-width {
+        grid-column: span 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <div class="control-panel">
+      <h1>Mi interprete Bazilio</h1>
+      <label for="notas">Notas </label>
+      <textarea id="notas" placeholder="C D E F G A B"></textarea>
+
+      <div class="btn-group">
+        <button id="crear">Crear</button>
+        <button id="borrar">Borrar</button>
+      </div>
+
+      <pre id="estado"></pre>
+    </div>
+
+    <div id="resultado">
+      <div class="results-grid">
+        <div>
+          <h2>Código Bazilio</h2>
+          <pre id="bzl"></pre>
+        </div>
+        <div>
+          <h2>Código LilyPond</h2>
+          <pre id="ly"></pre>
+        </div>
+        <div class="full-width">
+          <h2>Partitura (PDF)</h2>
+          <iframe id="pdf"></iframe>
+        </div>
+        <div>
+          <h2>Audios</h2>
+          <div class="audio-box">
+            <div class="audio-label">MP3</div>
+            <audio id="mp3" controls></audio>
+          </div>
+          <div class="audio-box">
+            <div class="audio-label">WAV</div>
+            <audio id="wav" controls></audio>
+          </div>
+        </div>
+        <div>
+          <h2>Descargas</h2>
+          <ul id="descargas"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const $ = id => document.getElementById(id);
+    const archivos = ["bzl", "ly", "midi", "pdf", "mp3", "wav"];
+
+    async function texto(url) {
+      return (await fetch(url + "?t=" + Date.now())).text();
+    }
+
+    $("crear").onclick = async () => {
+      const notas = $("notas").value.trim();
+      if (!notas) { $("estado").textContent = "Escribe al menos una nota."; return; }
+
+      $("estado").textContent = "Generando...";
+      try {
+        const r = await fetch("/generar", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ notas })
+        });
+        const d = await r.json();
+        $("estado").textContent = (d.ok ? "Listo\n" : "Error\n") + d.log;
+        if (!d.ok) return;
+
+        const t = Date.now();
+        $("bzl").textContent = await texto("programas/hello.bzl");
+        $("ly").textContent = await texto("programas/hello.ly");
+        $("pdf").src = "programas/hello.pdf?t=" + t;
+        $("mp3").src = "programas/hello.mp3?t=" + t;
+        $("wav").src = "programas/hello.wav?t=" + t;
+        $("descargas").innerHTML = archivos
+          .map(e => `<li><a href="programas/hello.${e}" download>hello.${e}</a></li>`)
+          .join("");
+        $("resultado").style.display = "block";
+      } catch (e) {
+        $("estado").textContent = "No se pudo conectar con server.py";
+      }
+    };
+
+    $("borrar").onclick = () => {
+      $("notas").value = "";
+      $("estado").textContent = "";
+      $("resultado").style.display = "none";
+      $("pdf").removeAttribute("src");
+      $("mp3").removeAttribute("src");
+      $("wav").removeAttribute("src");
+      $("notas").focus();
+    };
+  </script>
+</body>
+</html>

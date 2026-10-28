@@ -1,0 +1,4 @@
+Main |:
+    <w> "Hello Bazilio"
+    (:) {E E F G G F E D C C D E E D D }
+:|
